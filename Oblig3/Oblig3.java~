@@ -1,0 +1,125 @@
+import java.util.Scanner;
+import java.io.File;
+import java.util.regex.Pattern;
+import java.util.Vector;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.TreeMap;
+
+public class Oblig3 {
+    public static void main(String[] args) {
+	Scanner stdin = new Scanner(System.in);
+	Readfile file1 = new Readfile(args[0]); // read file config.txt
+	Readfile file2 = new Readfile(args[1]); // read file data.txt
+      
+	LinkedList<Vector<String>> list1 = file1.read(); 
+	// return a linkedlist of vectors for each line in config.txt
+	LinkedList<Vector<String>> list2 = file2.read(); 
+	// return a linkedlist of vectors for each line in data.txt
+	Network network = new Network();
+
+	for(Vector<String> line: list2){
+	    // for each line in data.txt
+	    ArrayList<Integer> dataElements = new ArrayList<Integer>();
+	    for(int i = 2; i < line.size(); i++){
+		if(line.get(i)!= null){
+		    // put the data elements in an arraylist
+		    dataElements.add(Integer.parseInt(line.get(i)));
+		}
+	    }
+	    // make a new data, add its id, capacity and dataelements
+	    Machine data = new Machine(Integer.parseInt(line.get(0)),Integer.parseInt(line.get(1)), dataElements);
+	    network.addMachine(data);
+	}
+	// make all the connections
+	network.makeConnections(list1);
+	returnRequest(network);
+
+    }
+
+    public static void askRequest(Vector<String> requestedInfo){
+	System.out.println("");
+	System.out.println("give the request in the form; \n"
+			   + "machine_id : search_preference : ownership_preference : element element \n" +
+			   "Notice the space between each arguments." );
+	System.out.println("");
+	Scanner request = new Scanner(System.in);
+	String line = request.nextLine().trim();
+	String regex = "\\W";
+	Pattern pattern = Pattern.compile(regex);
+	String[] words = pattern.split(line);
+	for(String word : words){
+	    word.trim();
+	    if(word.equals("")){
+		continue;
+	    }
+	    requestedInfo.add(word);
+	}
+
+    }
+
+    public static void returnRequest(Network network){
+	Vector<String> requestedInfo = new Vector<String>();
+	askRequest(requestedInfo);
+	int machineId = Integer.parseInt(requestedInfo.get(0));
+	String searchPreference = requestedInfo.get(1);
+	String ownershipPreference = requestedInfo.get(2);
+	float totalCost = 0;
+	float totalTime = 0;
+	for(int i = 3; i < requestedInfo.size(); i++){
+	    int element = Integer.parseInt(requestedInfo.get(i));
+	    network.shortestPath(machineId,searchPreference);
+	    PriorityQueue<Machine> queue = new PriorityQueue<Machine>();
+	    network.findElement(element, ownershipPreference,
+				queue);
+	    if(queue.isEmpty()== true){
+		System.out.println(element+" : does not exist");
+	    }else{
+		// machine which has the current element
+	
+		Machine machineE = queue.poll();
+	       
+		network.makeRoute(machineE.id);
+		if(machineE.endPointer != machineId){
+		    System.out.println(element+" : route does not exist for this element");
+		} else{
+		    System.out.println(element + " : " + machineE.route + " " +
+				       "(t = " + machineE.time +
+				       " c = " + machineE.cost + ")" );
+		    totalCost += machineE.cost;
+		    totalTime += machineE.time;
+		    if(network.network.get(machineId).containsElementO(element) == false
+		       && network.network.get(machineId).containsElementC(element) == false){
+			network.network.get(machineId).addCopyElement(element);
+		    }
+		}
+	    }   
+	}
+	System.out.println("");
+	System.out.println("Totall cost: " + totalCost + "  " +
+			   "Totall time; " + totalTime );
+	System.out.println(" ");
+	System.out.println("Do you want to make another request? \n" 
+			   + "If yes enter y, if exit enter n");
+
+	Scanner enter = new Scanner(System.in);
+	while(enter.hasNextLine()){
+	    String line = enter.nextLine().trim();
+	    switch (line.charAt(0)){
+	    case 'n':
+		System.exit(0);
+		break;
+	    case 'y':
+		returnRequest(network);
+		break;
+	    }
+	}
+
+    }
+
+    
+    
+}

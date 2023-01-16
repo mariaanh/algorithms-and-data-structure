@@ -1,0 +1,28 @@
+Hi,
+
+I did Djikstra shortest path algorithm with priority queue for
+unvisited notes, and stored the shortest path info
+for all machines. Afterwards, I iterates over the machines and put
+the ones which have the requested element in a priority queue.
+The priority queue prioritize according to the requested preference.
+If search preference was cost, the element with lowest cost will
+be first in queue.
+Since the method for search preference = B also satisfies the
+request for search preference = C with no lower
+efficiency, I used method for search preference= B
+for C as well.
+
+Dijkstra method with priority queue has run time O(E + Vlog(V))
+E = edges and V = nodes.
+
+Other alternatives to find the shortest path:
+ Floyd algorithm which has run time O(V^3)
+ shortest path by doing all combinations,
+this has the worst case run time. 
+
+My method has relatively good run time.
+
+The rest are programs to print out the stored info, which
+are not very relevant. 
+
+  

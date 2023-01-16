@@ -1,0 +1,14 @@
+
+public class Connection{
+    int data1;
+    int data2;
+    float cost;
+    float time;
+
+    public Connection(int data1, int data2, float time, float cost){
+	this.data1 = data1;
+	this.data2 = data2;
+	this.cost = cost;
+	this.time = time;
+    }
+}

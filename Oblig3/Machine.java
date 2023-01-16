@@ -1,0 +1,88 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Machine implements Comparable<Machine>{
+    int id;
+    int capacity;
+    ArrayList<Integer> machineElements;
+    // elements which belong the this machine
+    ArrayList<Integer> cMachineElements = new ArrayList();
+    // ArrayList of copy elements
+    HashMap<Integer, Connection> listOfAllConnections = new HashMap<Integer,Connection>();
+    // list of all the machines which are connected to this machine.
+
+
+    // information stores during dijikstra shortest path 
+    // algorithm
+
+    boolean unvisited;
+    int backPointer;
+    float weight;
+    float cost;
+    float time;
+    String route;
+    int endPointer;
+
+    public Machine(int id, int capacity, ArrayList<Integer> machineElements){
+	this.id = id;
+	this.capacity = capacity;
+	this.machineElements = machineElements;
+    }
+    
+    public void addConnection(int machineId, Connection connection){
+	/* add a connection to the HashMap, where the id of the machine this machine is
+	 connected to is put in as key and connection as value */
+	listOfAllConnections.put(machineId, connection);
+    }
+
+    // find whether this machine contains an orginal of the requested element
+    public boolean containsElementO(Integer element){
+	return machineElements.contains(element);
+
+    }
+
+    /* whether this machine contains a copy of the requested element */
+    public boolean containsElementC(Integer element){
+	return cMachineElements.contains(element);
+    }
+
+    // reset the stored shortest path info
+    public void resetStoredSPInfo(){
+	this.unvisited = true;
+	this.backPointer = 0;
+	this.weight = Float.MAX_VALUE;
+	this.route = "null";
+    }
+
+    // method for adding a copy
+    public void addCopyElement(Integer element){
+	if(this.capacity - machineElements.size() > cMachineElements.size()){
+	    cMachineElements.add(element);
+	}else if(this.capacity - machineElements.size() == cMachineElements.size()){
+	    cMachineElements.remove(0);
+	    cMachineElements.add(element);
+	}
+    }
+
+    /* machines are compared by their weights,
+       which correspond to their cost, time or both
+       according to the request
+     */
+    public int compareTo(Machine other){
+	if(other.weight == this.weight){
+	    if(this.time < other.time){
+		return -1;
+	    }else if(this.time > other.time){
+		return 1;
+	    }else{ // this.time == other.time
+		return 0;
+	    }
+	}
+	else if(this.weight < other.weight){
+	    return -1;
+	} else{ // this.weight > other.weight
+	    return 1;
+	}
+
+    }
+}

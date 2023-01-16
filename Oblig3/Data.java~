@@ -1,0 +1,81 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Data implements Comparable<Data>{
+    int id;
+    int capacity;
+    ArrayList<Integer> dataElements;
+    ArrayList<Integer> cDataElements = new ArrayList(); 
+    HashMap<Integer, Connection> listOfAllConnections = new HashMap<Integer,Connection>();
+    // list of all the datas which are connected to this machine.
+
+
+    // information stores during dijikstra shortest path 
+    // algorithm
+
+    boolean unvisited;
+    int backPointer;
+    float weight;
+    float cost;
+    float time;
+    String route;
+    int endPointer;
+
+    public Data(int id, int capacity, ArrayList<Integer> dataElements){
+	this.id = id;
+	this.capacity = capacity;
+	this.dataElements = dataElements;
+    }
+    
+    public void addConnection(int dataId, Connection connection){
+	/* add a connection to the HashMap, where the id of the data this machine is
+	 connected to is put in as key and connection as value */
+	listOfAllConnections.put(dataId, connection);
+    }
+
+    // find whether this machine contains an orginal of the requested element
+    public boolean containsElementO(Integer element){
+	return dataElements.contains(element);
+
+    }
+
+    /* whether this machine contains a copy of the requested element */
+    public boolean containsElementC(Integer element){
+	return cDataElements.contains(element);
+    }
+
+    public void resetStoredSPInfo(){
+	this.unvisited = true;
+	this.backPointer = 0;
+	this.weight = Float.MAX_VALUE;
+	this.route = "null";
+    }
+
+    public void addCopyElement(Integer element){
+	if(this.capacity - dataElements.size() > cDataElements.size()){
+	    cDataElements.add(element);
+	}else if(this.capacity - dataElements.size() == cDataElements.size()){
+	    cDataElements.remove(0);
+	    cDataElements.add(element);
+	}
+    }
+
+    public int compareTo(Data other){
+	if(other.weight == this.weight){
+	    if(this.time < other.time){
+		return -1;
+	    }else if(this.time > other.time){
+		return 1;
+	    }else{ // this.time == other.time
+		return 0;
+	    }
+	}
+	else if(this.weight < other.weight){
+	    return -1;
+	} else{ // this.weight > other.weight
+	    return 1;
+	}
+
+    }
+    
+}
