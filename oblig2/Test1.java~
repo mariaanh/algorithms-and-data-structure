@@ -1,0 +1,10 @@
+import java.util.HashMap;
+
+
+class Test1{
+    public static void main(String[] args){
+	HashMap<int,String> map = new HashMap<int,String>();
+	map.put(3,"s");
+	System.out.println(map.get(3));
+    }
+}

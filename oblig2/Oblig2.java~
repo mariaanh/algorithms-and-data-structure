@@ -1,0 +1,97 @@
+import java.io.File;
+import java.util.Vector;
+import java.util.Scanner;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.Map;
+import java.lang.Integer;
+import java.util.regex.Pattern;
+
+public class Oblig2 {
+    public static void main(String[] args) {
+	Graph graph = new Graph();
+
+	try {
+	    Scanner stdin = new Scanner(System.in);
+
+	    Scanner infile = new Scanner (new File (args[0]));
+
+	    String firstLine = infile.nextLine();
+	    infile.hasNextLine();
+	    firstLine = firstLine.trim();
+	    int numberOfTasks = Integer.valueOf(firstLine);
+ 
+	    while (infile.hasNextLine()) {
+		String line = infile.nextLine();
+		Vector<String> data = new Vector<String>();
+
+		line = line.trim();
+
+		if (line.equals(""))
+		    /* Do nothing */
+		    continue;
+
+		String regex = "\\s";
+		Pattern pattern = Pattern.compile(regex);
+		String[] words = pattern.split(line);
+
+		for (String word : words) {
+		    if (word.equals(""))
+			continue;
+		    word.trim();
+		    data.add(word);
+		}
+		ArrayList<Integer> parents = new ArrayList<Integer>();
+		for(int i = 4; i < data.size(); i++){
+		    parents.add(Integer.valueOf(data.get(i)));
+		 
+		}
+		Task task = new Task(Integer.parseInt(data.get(0)),
+				     data.get(1),
+				     Integer.parseInt(data.get(2)),
+				     Integer.parseInt(data.get(3)),
+				     parents);
+		graph.addTask(Integer.parseInt(data.get(0)),task);
+	    }
+
+	    infile.close();
+	} catch(java.io.FileNotFoundException e){
+	    System.err.println("can't find the given file");
+	    System.exit(1);
+	}
+	
+
+
+	/* executing the project */
+	graph.makeEdges();
+	
+	System.out.println("");
+
+	try {
+	    graph.hasLoop();
+
+	    System.out.println("there is no loop.");
+	} catch (LoopException e) {
+	    System.err.println("the graph has a loop, exiting with failure");
+	    System.exit(1);
+	}
+
+	graph.addLatestStart();
+	graph.addFinishTime();
+	LinkedList<Task> list = graph.criticalTasks();
+	System.out.println("");
+	if(list.isEmpty()){
+	    System.out.println("there is no critical task");
+	}else{
+            System.out.println("the critical tasks are:");
+	    for(Task criticalTask : list){
+		System.out.println(criticalTask.name);
+	    }
+	}
+	System.out.println("");
+	graph.printOutTasks();
+    }
+}

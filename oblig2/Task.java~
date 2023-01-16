@@ -1,0 +1,73 @@
+import java.util.ArrayList;
+
+
+public class Task implements Comparable<Task>{
+    public int id;
+    public String name;
+    public int time;
+    public int manpower;
+    public ArrayList<Task>  children = new ArrayList<Task>();
+    public ArrayList<Task> parents = new ArrayList<Task>();
+    public ArrayList<Integer> parentsInfo;
+    public int finishTime ;
+    public int earliestStart;
+    public int latestStart;
+    public int indegree;
+
+
+    public Task(int id,
+		String name,
+		int time,
+		int manpower,
+		ArrayList<Integer> parentsInfo){
+	this.id = id;
+	this.name = name;
+	this.time = time;
+	this.manpower = manpower;
+	this.parentsInfo = parentsInfo;
+
+    }
+    public void addParent(Task parent){
+	parents.add(parent);
+	indegree += 1;
+       
+    }
+    public void addChild(Task child){
+	children.add(child);
+    }
+
+    public void addLatestStart(){
+	if(!children.isEmpty()){
+	    Task tmp = children.get(0);
+	    for(int i = 1; i < children.size(); i++){
+		if(tmp.earliestStart > children.get(i).earliestStart){
+		    tmp = children.get(i);
+		}else{
+		    continue;
+		}
+	    }
+	    this.latestStart = tmp.earliestStart - time;
+	} 
+    }
+    
+    public void addFinishTime(){
+	this.finishTime = time + earliestStart;
+    }
+
+    public int compareTo(Task other){
+	if(this.earliestStart > other.earliestStart){
+	    return 1; 
+	}
+	else if(this.earliestStart < other.earliestStart){
+	    return -1;
+	}else{ // this.latestStart == other.latestStart 
+	    if(this.finishTime > other.finishTime){
+		return 1;
+	    }else if(this.finishTime < other.finishTime){
+		return -1;
+	    }else{
+		return 0;
+	    }
+	}
+    }
+}

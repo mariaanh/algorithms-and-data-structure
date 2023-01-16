@@ -1,0 +1,173 @@
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Collections;
+import java.lang.Math;
+import java.util.TreeMap;
+import java.util.Map;
+
+
+public class Graph{
+    public HashMap<Integer,Task> tasks = new HashMap<Integer,Task>();
+
+    public void addTask(int id, Task task){
+	tasks.put(id, task);
+    }
+
+    public void makeEdges(){
+	for(Task child: tasks.values()){
+	    ArrayList<Integer> parents = child.parentsInfo;
+	    for(int i : parents){
+		if( i != 0){
+		    Task parent = tasks.get(i);
+		    child.addParent(parent);
+		    parent.addChild(child);
+		}
+	    }
+	}
+    }
+    
+    public boolean hasLoop() throws LoopException{
+	LinkedList<Task> list = new LinkedList<Task>();
+	Task v;
+	int count = 0;
+	
+	for(Task task: tasks.values()){
+	    ArrayList<Task> parents = task.parents;
+	    if(!parents.isEmpty()){
+		continue;
+	    }else{
+		task.earliestStart = 0;
+		list.add(task);
+	    }
+	}
+
+
+	while(!list.isEmpty()){
+	    v = list.removeFirst();
+	    ArrayList<Task> children = v.children;
+	    count++;
+	    if(!children.isEmpty()){
+		for(Task temp: children){
+		    temp.indegree -= 1;
+		    if(temp.indegree == 0){
+			temp.earliestStart = v.time + v.earliestStart;
+			list.add(temp);
+		    }
+		}
+	    }
+	}
+
+	if(count< tasks.size())
+	    throw new LoopException("the graph has a loop");
+
+	return false;
+    }
+    
+    public void addLatestStart(){
+	for(Task task: tasks.values()){
+	    task.addLatestStart();
+	}
+    }
+
+    public void addFinishTime(){
+	for(Task task: tasks.values()){
+	    task.addFinishTime();
+	}
+    }
+    
+    public LinkedList<Task> criticalTasks(){
+	// iterates over the tasks to find those tasks with 
+	// earliest start time == latest start time.
+	LinkedList<Task> criticalTasks = new LinkedList<Task>();
+	for(Task task: tasks.values()){
+	    if(task.earliestStart == task.latestStart){
+		criticalTasks.add(task);
+	    }else{ 
+		continue;
+	    }
+	}
+	return criticalTasks;
+    }
+
+    public void printOutTasks(){
+	System.out.println("Executing Tasks........ ");
+	System.out.println("");
+	TreeMap<Integer,ContainerForPrintTasks> sortedMap = new TreeMap<Integer,ContainerForPrintTasks>();
+	for(Task task : tasks.values()){
+	    int earliestStart = task.earliestStart;
+	    int finishTime = task.finishTime;
+	    if(sortedMap.containsKey(earliestStart) == false){
+		ContainerForPrintTasks c = new ContainerForPrintTasks();
+		c.addStartingTask(task);
+		sortedMap.put(earliestStart,c);
+	    }else{
+		sortedMap.get(earliestStart).addStartingTask(task);
+	    }
+	    if(sortedMap.containsKey(finishTime) == false){
+		ContainerForPrintTasks f = new ContainerForPrintTasks();
+		f.addFinishedTask(task);
+		sortedMap.put(finishTime,f);
+	    }else{
+		sortedMap.get(finishTime).addFinishedTask(task);
+	    }
+	}
+	int currentStaff = 0;
+	int time = 0;
+	while(!sortedMap.isEmpty()){
+	    Map.Entry<Integer,ContainerForPrintTasks> first = sortedMap.pollFirstEntry();
+	    ContainerForPrintTasks tmp = first.getValue();
+	    System.out.println("Time:"+ tmp.time);
+	    time = tmp.time;
+	    tmp.print();
+	    currentStaff += tmp.manpower;
+	    System.out.println("Current staff:"+currentStaff);
+	    System.out.println("");
+	}
+	System.out.println("The shortest executing time is "+time);
+	
+    }
+
+}
+
+class LoopException extends Exception {
+    LoopException(){
+	super();
+    }
+
+    LoopException(String e){
+	super(e);
+    }
+}
+
+class ContainerForPrintTasks{
+    int manpower;
+    int time;
+    LinkedList<Task> startingTasks = new LinkedList<Task>();
+    LinkedList<Task> finishedTasks = new LinkedList<Task>();
+
+    public void addStartingTask(Task task){
+	startingTasks.add(task);
+	manpower += task.manpower;
+	this.time = task.earliestStart;
+    }
+    public void addFinishedTask(Task task){
+	finishedTasks.add(task);
+	manpower -= task.manpower;
+	this.time = task.finishTime;
+    }
+
+    public void print(){
+	if(!finishedTasks.isEmpty()){
+	    for(Task f: finishedTasks){
+		System.out.println("Finished:"+ f.name);
+	    }
+	}
+	if(!startingTasks.isEmpty()){
+	    for(Task s: startingTasks){
+		System.out.println("Starting:"+ s.name);
+	    }
+	}
+    }
+}

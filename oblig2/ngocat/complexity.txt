@@ -1,0 +1,35 @@
+Task 1: 
+I used topological sort method, where I put the tasks with indegree 0 into a LinkedList.
+1. find all the tasks with no parents, and put them in a Linkedlist.
+2. take the first task in queue out of the linkedlist, 
+and remove the edge from their children.
+3. if there are children with indegree 0 (no dependencies), put them in the linkedlist.
+4. go back to step 1.
+
+This method is therefore O(V+E), where V is nodes and E is edges.
+
+Task 2: 
+When doing the topological sort method, I also give the earliest start time at step 1 and 3.
+At step 1 all tasks with no parents are given 0 as the earliest start time.
+At step 3, the tasks with indegree 0 are given their earliest start time as their parent's
+earliest start time + their parents time (the time it takes to finish the task).
+
+1. I made a class calls container, where there is an array for 
+finished tasks and starting tasks. and int time. 
+2. I iterate through the tasks and groups them into containers 
+according to their finish time and earliest start time.  
+the containers are put into a HashMap with time as keys.
+A task is put into two differently containers, once according to its earliest start time,
+once according to its finish time.  
+4. I iterate through the HashMap to print out the task according to their time.
+
+As I iterate once to group the tasks,
+and the seconde time to take them out for prints with their dublicates,
+estimate runtime is O(v+2v) = O(v).  
+
+Task 3:
+To find the tasks latest start time, I used the pointer to point at the child with 
+least earliest start time, and add this to the task's own time to give latest start time.
+Also latest start time = child with least earliest start time - task's own time.
+This is O(v + e) as I iterate once through the nodes and once through the edges.   
+	.
